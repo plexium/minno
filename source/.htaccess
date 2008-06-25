@@ -1,0 +1,10 @@
+RewriteEngine on
+DirectoryIndex index.php
+
+# modify the RewriteBase directive below for subdirectory installations.
+
+RewriteBase /minno
+
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteRule ^([a-zA-Z0-9_\/\!\~\-\.]*)$ index.php?id=$1 [QSA]

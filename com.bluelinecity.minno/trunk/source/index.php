@@ -18,9 +18,9 @@ if ( isset($_POST['page']) )
     mysql_query( $sql, $DB ) or die(mysql_error() . "<pre>" . h($sql) . "</pre>");
 }
 
-echo i('header',false); 
-i();
-echo i('footer',false);
+ob_start();
+echo i('header',false);  i(); echo i('footer',false);
+echo ob_get_clean();
 
 function i( $s = null, $echo = true )
 {
@@ -58,5 +58,5 @@ function i( $s = null, $echo = true )
 }
 
 function h($s) { return htmlspecialchars($s); }
-
+function p($p) { $r = mysql_query( "SELECT * FROM {$GLOBALS['table']} WHERE id LIKE '{$p}'", $DB ); return mysql_fetch_array($r); }
 ?>

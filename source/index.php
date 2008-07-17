@@ -1,52 +1,44 @@
 <?php
 session_start();
 
+define('DS',DIRECTORY_SEPARATOR);
 require_once( 'config.php' );
 
-$DB = mysql_connect($host,$user,$pass);
-mysql_select_db( $database, $DB );
-
-if ( isset($_POST['page']) )
-{
-    $id = (get_magic_quotes_gpc() ? $_GET['id'] : addslashes($_GET['id']) );
-    $page = (get_magic_quotes_gpc() ? $_POST['page'] : addslashes($_POST['page']) );    
-    if ( empty($page) )     
-        $sql = "DELETE FROM {$table} WHERE id = '{$id}'";
-    else
-        $sql = "INSERT INTO {$table} VALUES ('{$id}','{$page}') ON DUPLICATE KEY UPDATE page = '{$page}'";
-
-    mysql_query( $sql, $DB ) or die(mysql_error() . "<pre>" . h($sql) . "</pre>");
-}
+if ( isset($_POST['page'])&& $_SESSION['auth'] )
+    fo((empty($_GET['id']) ? 'index.html': str_replace('..','',$_GET['id'])), stripslashes($_POST['page']));
 
 ob_start();
-echo i('header',false);  i(); echo i('footer',false);
+if(!isset($_GET['only']))echo i('header.part',false);  
+i(); 
+if(!isset($_GET['only']))echo i('footer.part',false);  
 echo ob_get_clean();
 
 function i( $s = null, $echo = true )
 {
-   global $DB, $table;
+   global $DB, $data, $index;
    static $stack = array();
     
-   $s = ( $s === null ? ( empty($_GET['id']) ? 'index' : $_GET['id'] ) : $s );
-   $s = (get_magic_quotes_gpc() ? $s : addslashes($s) );
+   $s = ( $s === null ? ( empty($_GET['id']) ? 'index.html' : $_GET['id'] ) : $s );
+   $s = str_replace('..','',$s);
 
    if ( !isset($stack[$s]) )
    {
       $stack[$s] = count($stack);
-      $result = mysql_query( "SELECT * FROM {$table} WHERE id LIKE '{$s}'", $DB );
-     
-      if ( $result == null ) 
-         mysql_query("CREATE TABLE {$table} (`id` VARCHAR( 255 ) NULL ,`page` TEXT NULL ,UNIQUE (`id`),FULLTEXT (`page`)) ENGINE = MYISAM;", $DB ) or die(mysql_error());
+      $files = glob(n($s));
       
+      if ( empty($files) && $s == 'index.html' ) $_SESSION['auth']=true; 
+         
       ob_start();
-
-      $row = mysql_fetch_array( $result );      
-      do
-          if ( ( isset($_GET['edit']) || !$row ) && $s == ($_GET['id'] || $s == 'index') && $echo == true && $stack[$s] == 0 )
-              echo '<form action="'.h($_GET['id']).'?" method="post"><textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars($row['page']).'</textarea><input type="submit" value="'.($row?'update':'create').'"></form>';
-          else
-              eval( " ?>{$row['page']}<?php " );
-      while ( $row = mysql_fetch_array( $result ) );
+      
+      for ($c=0;$c<count($files)||$c==0;$c++){
+         $page = fi( empty($files[$c]) ? n($s) : $files[$c] );         
+         if ( $_SESSION['auth'] && ( isset($_GET['edit']) || empty($page) ) && ($s == $_GET['id'] || $s == 'index.html') && $echo == true && $stack[$s] == 0 )
+            echo '<form action="'.dirname($_SERVER['SCRIPT_NAME']).'/'.h($_GET['id']).'?" method="post"><textarea cols="80" rows="20" id="page" name="page">'.h($page).'</textarea><input type="submit" value="'.(empty($page)?'create':'update').'"></form>';
+         elseif ( empty($page) && $s != '404' )
+            i('404');
+         else
+            eval( " ?>{$page}<?php " );
+      }
 
       unset( $stack[$s] );
         
@@ -58,5 +50,13 @@ function i( $s = null, $echo = true )
 }
 
 function h($s) { return htmlspecialchars($s); }
-function p($p) { $r = mysql_query( "SELECT * FROM {$GLOBALS['table']} WHERE id LIKE '{$p}'", $DB ); return mysql_fetch_array($r); }
+function fi($f) { return @file_get_contents($f);}
+function fo($f,$p){ 
+   $d = explode('/',$f);   
+   for($c=0;$c<(count($d)-1);$c++)
+      if(!file_exists(n(implode('/',array_slice($d,0,($c+1))))))
+         mkdir(n(implode('/',array_slice($d,0,($c+1)))),0777);   
+   if(empty($p))unlink(n($f));else{$fp=fopen(n($f),'w');fwrite($fp,$p);fclose($fp);} 
+   }
+function n($f){return $GLOBALS['data'].DS.preg_replace('/[\\/]/',DS,$f);}
 ?>

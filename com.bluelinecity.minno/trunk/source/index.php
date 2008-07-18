@@ -1,58 +1,51 @@
-<?php //minno 
+<?php //minno v1
 $user = 'root';
 $pass = '';
 $data = 'data';
 $index = 'index.html';
+$base = 'minno/';
 
 session_start();
 define('DS',DIRECTORY_SEPARATOR);
+$G = $_GET;$P = $_POST;
+$G['id'] = str_replace('..','',$G['id']);
+if ( (isset($P['page'])||isset($G['page']))&& (empty($user) || $_SESSION['auth']) )
+    fo((empty($G['id']) ? $index: $G['id']), stripslashes((empty($P['page'])?$G['page']:$P['page'])));
 
-if ( isset($_POST['page'])&& $_SESSION['auth'] )
-    fo((empty($_GET['id']) ? $index: str_replace('..','',$_GET['id'])), stripslashes($_POST['page']));
+echo i('*.function'). (isset($G['only'])?'':i('header.html')) . i() . (isset($G['only'])?'':i('footer.html'));
 
-ob_start();
-if(!isset($_GET['only']))echo i('header.part',false);  
-i(); 
-if(!isset($_GET['only']))echo i('footer.part',false);  
-echo ob_get_clean();
-
-function i( $s = null, $echo = true )
+function i( $id = null )
 {
-   global $DB, $data, $index;
-   static $stack = array();
-    
-   $s = ( $s === null ? ( empty($_GET['id']) ? $index : $_GET['id'] ) : $s );
-   $s = str_replace('..','',$s);
+   extract($GLOBALS);
+   static $_8 = array();
+   
+   $edit = ( $id === null );   
+   $id = ( $edit ? ( empty($G['id']) ? $index : $G['id'] ) : $id );
 
-   if ( !isset($stack[$s]) )
+   if ( !isset($_8[$id]) )
    {
-      $stack[$s] = count($stack);
-      $files = glob(n($s));
+      $_8[$id] = 1;
+      $files = glob(n($id));
       
-      if ( empty($files) && $s == $index ) $_SESSION['auth']=true; 
+      if ( empty($files) && $id == $index ) $_SESSION['auth']=true; 
          
-      ob_start();
-      
+      ob_start();      
       for ($c=0;$c<count($files)||$c==0;$c++){
-         $page = fi( empty($files[$c]) ? n($s) : $files[$c] );         
-         if ( $_SESSION['auth'] && ( isset($_GET['edit']) || empty($page) ) && ($s == $_GET['id'] || $s == $index) && $echo == true && $stack[$s] == 0 )
-            echo '<form action="'.dirname($_SERVER['SCRIPT_NAME']).'/'.h($_GET['id']).'?" method="post"><textarea cols="80" rows="20" id="page" name="page">'.h($page).'</textarea><input type="submit" value="'.(empty($page)?'create':'update').'"></form>';
-         elseif ( empty($page) && $s != '404' )
+         $page = fi( empty($files[$c]) ? n($id) : $files[$c] );        
+         if ( (empty($user) || $_SESSION['auth']) && ( isset($G['edit']) || empty($page) ) && ($id == $G['id'] || $id == $index) && $edit )
+            echo '<form action="/'.$base.$G['id'].'?" method="post"><textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars($page).'</textarea><input type="submit" value="'.(empty($page)?'create':'update').'"></form>';
+         elseif ( empty($page) && $id != '404' )
             i('404');
          else
             eval( " ?>{$page}<?php " );
       }
 
-      unset( $stack[$s] );
+      unset( $_8[$id] );
         
-      if ( $echo ) 
-         echo ob_get_clean();
-      else 
-         return ob_get_clean();
+      return ob_get_clean();
    }
 }
 
-function h($s) { return htmlspecialchars($s); }
 function fi($f) { return @file_get_contents($f);}
 function fo($f,$p){ 
    $d = explode('/',$f);   
@@ -62,4 +55,5 @@ function fo($f,$p){
    if(empty($p))unlink(n($f));else{$fp=fopen(n($f),'w');fwrite($fp,$p);fclose($fp);} 
    }
 function n($f){return $GLOBALS['data'].DS.preg_replace('/[\\/]/',DS,$f);}
+function f($f){return !function_exists($f);}
 ?>

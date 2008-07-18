@@ -10,30 +10,7 @@ function edit( $text = null ){
 ?>
 
 // functions/login
-<?php
-if ( isset($_GET['logout']) ) unset($_SESSION['auth']);
-
-if ( isset($_GET['login']) )
-   if ( $_POST['user'] == $GLOBALS['user'] && $_POST['pass'] == $GLOBALS['pass'] )
-      $_SESSION['auth'] = true;
-   else
-      unset($_SESSION['auth']);
-
-function login_form(){
-   if ( !$_SESSION['auth'] ){ ?>
-   <form method="post" action="?login">
-      <p><label for="user">User:</label>
-         <input id="user" name="user" /></p>
-      <p><label for="pass">Password:</label>
-         <input type="password" id="pass" name="pass" /></p>
-      <p><input type="submit" value="Login" /></p>
-   </form>
-<?php } else { ?>
-   <p>Currently Logged In</p>
-   <p>[<a href="?logout">logout</a>]</p>
-<?php } 
-}
-?>
+login.function?page=<?php if(f('login_form')){if(isset($_GET['logout']))unset($_SESSION['auth']);if(isset($_GET['login']))if($_POST['user']==$GLOBALS['user']&&$_POST['pass']==$GLOBALS['pass'])$_SESSION['auth']=true;else unset($_SESSION['auth']);function login_form(){if(!$_SESSION['auth']){ ?><form method="post" action="?login"><p><label for="user">User:</label><input id="user" name="user" /></p><p><label for="pass">Password:</label><input type="password" id="pass" name="pass" /></p><p><input type="submit" value="Login" /></p></form><?php }else{ ?><p>Currently Logged In</p><p>[<a href="?logout">logout</a>]</p><?php }}} ?>
 
 // functions/css
 <?php

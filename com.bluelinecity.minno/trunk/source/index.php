@@ -9,10 +9,12 @@ session_start();
 define('DS',DIRECTORY_SEPARATOR);
 $G = $_GET;$P = $_POST;
 $G['id'] = str_replace('..','',$G['id']);
+if ( $P['login'] == "{$user};{$pass}" ) $_SESSION['auth'] = 1;
+if ( $G['logout'] ) unset($_SESSION['auth']);
 if ( (isset($P['page'])||isset($G['page']))&& (empty($user) || $_SESSION['auth']) )
     fo((empty($G['id']) ? $index: $G['id']), stripslashes((empty($P['page'])?$G['page']:$P['page'])));
 
-echo i('*.function'). (isset($G['only'])?'':i('header.html')) . i() . (isset($G['only'])?'':i('footer.html'));
+echo i('*.function.php'). (isset($G['only'])?'':i('header.php')) . i() . (isset($G['only'])?'':i('footer.php'));
 
 function i( $id = null )
 {

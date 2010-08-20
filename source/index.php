@@ -1,9 +1,9 @@
-<?php //minno v1
+<?php //minno v1.1
 $user = 'root';
 $pass = '';
 $data = 'data';
 $index = 'index.html';
-$base = 'projects/com.bluelinecity.minno/source/';
+$base = 'com.bluelinecity.minno/source/';
 
 session_start();
 define('DS',DIRECTORY_SEPARATOR);
@@ -11,10 +11,10 @@ $G = $_GET;$P = $_POST;
 $G['id'] = str_replace('..','',$G['id']);
 if ( $P['login'] == "{$user};{$pass}" ) $_SESSION['auth'] = 1;
 if ( $G['logout'] ) unset($_SESSION['auth']);
-if ( (isset($P['page'])||isset($G['page']))&& (empty($user) || $_SESSION['auth']) )
+if ( (isset($P['page'])||isset($G['page'])) && (empty($user) || $_SESSION['auth']) )
     fo((empty($G['id']) ? $index: $G['id']), stripslashes((empty($P['page'])?$G['page']:$P['page'])));
 
-echo i('*.function.php'). (isset($G['only'])?'':i('header.php')) . i() . (isset($G['only'])?'':i('footer.php'));
+echo (isset($G['only'])?i():i('core.html'));
 
 function i( $id = null )
 {
@@ -39,13 +39,22 @@ function i( $id = null )
          elseif ( empty($page) && $id != '404' )
             i('404');
          else
-            eval( " ?>{$page}<?php " );
+			echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s+params\=\"([^\"]*)\".*?\/\>/i',"_mtag",$page);
       }
 
       unset( $_8[$id] );
         
       return ob_get_clean();
    }
+}
+
+function _mtag($matches)
+{	
+	list( $match, $func, $params ) = $matches;
+	if ( function_exists( $func ) )
+		return call_user_func_array( $func, explode(',', $params) );
+	else
+		return '';
 }
 
 function fi($f) { return @file_get_contents($f);}
@@ -57,5 +66,5 @@ function fo($f,$p){
    if(empty($p))unlink(n($f));else{$fp=fopen(n($f),'w');fwrite($fp,$p);fclose($fp);} 
    }
 function n($f){return $GLOBALS['data'].DS.preg_replace('/[\\/]/',DS,$f);}
-function f($f){return !function_exists($f);}
+function _fe($f){return !function_exists($f);}
 ?>

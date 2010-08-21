@@ -1,6 +1,6 @@
 <?php
 $user = 'root';
 $pass = '';
-$data = 'data';
+$store = 'data';
 $index = 'index.html';
-?>
+$base = '';

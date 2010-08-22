@@ -1,1 +1,127 @@
-<?php /*minno v1*/ $user='';$pass='';$data='data';$index='index.html';$base='';session_start();define('DS',DIRECTORY_SEPARATOR);$G=$_GET;$P=$_POST;$G['id']=str_replace('..','',$G['id']);if(isset($P['page'])&&(empty($user)||$_SESSION['auth']))fo((empty($G['id'])?$index:$G['id']),stripslashes($P['page']));echo i('*.function').(isset($G['only'])?'':i('header.html')).i().(isset($G['only'])?'':i('footer.html'));function i($id=null){extract($GLOBALS);static $_8=array();$edit=($id===null);$id=($edit?(empty($G['id'])?$index:$G['id']):$id);if(!isset($_8[$id])){$_8[$id]=1;$files=glob(n($id));if(empty($files)&&$id==$index)$_SESSION['auth']=true;ob_start();for($c=0;$c<count($files)||$c==0;$c++){$page=fi(empty($files[$c])?n($id):$files[$c]);if((empty($user)||$_SESSION['auth'])&&(isset($G['edit'])||empty($page))&&($id==$G['id']||$id ==$index)&&$edit)echo '<form action="/'.$base.$G['id'].'?" method="post"><textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars($page).'</textarea><input type="submit" value="'.(empty($page)?'create':'update').'"></form>';elseif(empty($page)&&$id!='404')i('404');else eval(" ?>{$page}<?php ");}unset($_8[$id]);return ob_get_clean();}}function fi($f){return @file_get_contents($f);}function fo($f,$p){$d=explode('/',$f);for($c=0;$c<(count($d)-1);$c++)if(!file_exists(n(implode('/',array_slice($d,0,($c+1))))))mkdir(n(implode('/',array_slice($d,0,($c+1)))),0777);if(empty($p))unlink(n($f));else{$fp=fopen(n($f),'w');fwrite($fp,$p);fclose($fp);}}function n($f){return $GLOBALS['data'].DS.preg_replace('/[\\/]/',DS,$f);}function f($f){return !function_exists($f);}?>
+<?php //minno v1.1
+
+session_start();
+
+define('DS', DIRECTORY_SEPARATOR );
+define('FILE_FILTER', '/^[a-z0-9_\/\-\*]*(\.(?:html|css|js))?$/i' );
+
+$id = ( empty( $_GET['id'] ) || !preg_match( FILE_FILTER, $_GET['id']) ) ? $index : str_replace('..','',$_GET['id']);
+$only = isset($_GET['only']);
+$edit = isset($_GET['edit']);
+$pagepost = $_POST['page'];
+$store = $store . DS;
+$webpath =  $base . $id;
+
+if ( $_POST['login'] == "{$user};{$pass}" ) _auth( true );
+if ( $_POST['submit'] == "Logout" ) _auth( false );
+
+if ( isset($_POST['page']) && _auth() ) _file_out( $id, stripslashes($pagepost) );
+
+foreach ( glob('functions/*.function.php') as $php ) include_once( $php );
+echo ( $only ? inc( $id ) : inc('core') );
+
+function inc( $id = null )
+{
+   static $_8 = array();
+
+   $default = empty($id);
+   $id = ( $default ? $GLOBALS['id'] : $id );
+   if ( !($native = _validate_path($id)) ) return '';
+   $files = glob( $GLOBALS['store'] . $native );
+    
+   //if index file doesn't exist, autologin
+   if ( empty($files) && $id == $GLOBALS['index'] ) _auth( true ); 
+	 
+   ob_start();
+   
+   if ( _auth() && $default && $id == $GLOBALS['id'] && ( $GLOBALS['edit'] || empty($files) ) )
+   {
+      $page = _file_in( $files[0] );
+      echo _form('<textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars( $page ).'</textarea>', (empty($page)?'Create':'Update') );
+   }
+   else if ( count($files) == 0 )
+      if ( $id == 'core' ) inc();
+      else echo ( $id == '404' ? 'File Not Found!' : inc('404') );
+   else
+      foreach ( $files as $f )
+      {
+         if ( !isset($_8[$f]) )
+	 {
+	    $_8[$f] = 1;
+	    echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(?:params\=\"([^\"]*)\")?.*?\/?\>/i',"_mtag", _file_in( $f ) );	
+	    unset( $_8[$f] );
+         }
+      }	
+	
+   return ob_get_clean();
+}
+
+
+function login()
+{
+   if ( _auth() )
+      return _form('Click to ','Logout');
+   else
+      return _form('<input type="password" name="login"/>','Login');
+}
+
+function _form( $innerhtml, $submit = "Submit", $action = null )
+{
+   return '<form action="' . ($action?$action:'/'.$GLOBALS['webpath'].'?') . '" method="post">'
+          . $innerhtml . '<input type="submit" name="submit" value="'.$submit.'" /></form>';   
+}
+
+function _mtag($matches)
+{	
+   list( $match, $func, $params ) = $matches;
+   if ( function_exists( $func ) )
+      return call_user_func_array( $func, explode(',', $params) );
+
+   return '';
+}
+
+function _file_in($f) 
+{ 
+   if ( $file = _validate_path( $f ) )
+      return @file_get_contents( $file);
+   return '';
+}
+
+function _file_out( $f, $p )
+{ 
+   $d = explode('/',$f);  
+   for( $c=0; $c<(count($d)-1); $c++ )
+   {
+      $path = $GLOBALS['store'] . _validate_path( implode('/', array_slice($d,0,($c+1))) );
+      if( $path && !file_exists($path) )
+         mkdir($path,0777);   
+   }
+
+   if ( $file = _validate_path($f) )
+   {
+      $file = $GLOBALS['store'] . $file;
+
+      if(empty($p))
+         unlink($file);
+      else 
+      {
+         $fp = fopen($file,'w');
+         fwrite($fp,$p);
+         fclose($fp);
+      }
+   } 
+}
+
+function _validate_path($f)
+{
+   if ( preg_match( FILE_FILTER , $f ) )
+   	return preg_replace('/[\\/]/',DS,$f);
+   return null;
+}
+
+function _auth( $s = null )
+{
+   if ( $s === null ) return $_SESSION['auth'];
+   if ( $s ) $_SESSION['auth'] = 1;
+   else unset($_SESSION['auth']);	
+}	

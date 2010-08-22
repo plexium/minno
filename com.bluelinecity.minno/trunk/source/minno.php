@@ -39,9 +39,14 @@ function inc( $id = null )
       $page = _file_in( $files[0] );
       echo _form('<textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars( $page ).'</textarea>', (empty($page)?'Create':'Update') );
    }
+   else if ( count($files) == 0 && $id == 'core')
+   { 
+      _file_out('core','<html><body><minno:inc/></body></html>'); 
+      _auth(true);
+      echo '<html><body>Minno Installed!<br /> Start your site by <a href="?id=core&edit">editing the core file</a>.</body></html>';
+   }
    else if ( count($files) == 0 )
-      if ( $id == 'core' ) inc();
-      else echo ( $id == '404' ? 'File Not Found!' : inc('404') );
+      echo ( $id == '404' ? 'File Not Found!' : inc('404') );
    else
       foreach ( $files as $f )
       {

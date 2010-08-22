@@ -3,4 +3,5 @@ DirectoryIndex index.php
 RewriteBase /
 RewriteCond %{SCRIPT_FILENAME} !-d
 RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteCond %{QUERY_STRING}    !^\?id\=
 RewriteRule ^([a-zA-Z0-9_\/\-]*(\.(html|css|js))?)$ index.php?id=$1 [QSA]

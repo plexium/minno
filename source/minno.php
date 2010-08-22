@@ -5,12 +5,15 @@ session_start();
 define('DS', DIRECTORY_SEPARATOR );
 define('FILE_FILTER', '/^[a-z0-9_\/\-\*]*(\.(?:html|css|js))?$/i' );
 
+$index = ( isset($index) ? $index : 'index.html' );
+$store = ( isset($store) ? $store : 'data/' );
+$base = ( isset($base) ? $base : '' );
 $id = ( empty( $_GET['id'] ) || !preg_match( FILE_FILTER, $_GET['id']) ) ? $index : str_replace('..','',$_GET['id']);
 $only = isset($_GET['only']);
 $edit = isset($_GET['edit']);
 $pagepost = $_POST['page'];
-$store = $store;
 $webpath =  $base . $id;
+$installation = "<html>\n<head>\n<title>Minno</title>\n</head>\n<body>\n<minno:inc/>\n<minno:login/>\n<a href=\"?edit\">[edit]</a></body>\n</html>";
  
 if ( $_POST['login'] == "{$user};{$pass}" ) _auth( true );
 if ( $_POST['submit'] == "Logout" ) _auth( false );
@@ -41,7 +44,7 @@ function inc( $id = null )
    }
    else if ( count($files) == 0 && $id == 'core')
    { 
-      _file_out('core','<html><body><minno:inc/></body></html>'); 
+      _file_out('core', $GLOBALS['installation'] ); 
       _auth(true);
       echo '<html><body>Minno Installed!<br /> Start your site by <a href="?id=core&edit">editing the core file</a>.</body></html>';
    }
@@ -72,7 +75,7 @@ function login()
 
 function _form( $innerhtml, $submit = "Submit", $action = null, $extra = '' )
 {
-   return '<form action="' . ($action?$action:'/'.$GLOBALS['webpath'].'?') . '" method="post" '. $extra .'>'
+   return '<form action="' . ($action?$action:'/'.$GLOBALS['webpath']) . '" method="post" '. $extra .'>'
           . $innerhtml . '<input type="submit" name="submit" value="'.$submit.'" /></form>';   
 }
 
@@ -123,4 +126,4 @@ function _auth( $s = null )
    if ( $s === null ) return $_SESSION['auth'];
    if ( $s ) $_SESSION['auth'] = 1;
    else unset($_SESSION['auth']);	
-}	
+}

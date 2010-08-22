@@ -9,15 +9,15 @@ $id = ( empty( $_GET['id'] ) || !preg_match( FILE_FILTER, $_GET['id']) ) ? $inde
 $only = isset($_GET['only']);
 $edit = isset($_GET['edit']);
 $pagepost = $_POST['page'];
-$store = $store . DS;
+$store = $store;
 $webpath =  $base . $id;
-
+ 
 if ( $_POST['login'] == "{$user};{$pass}" ) _auth( true );
 if ( $_POST['submit'] == "Logout" ) _auth( false );
 
 if ( isset($_POST['page']) && _auth() ) _file_out( $id, stripslashes($pagepost) );
 
-foreach ( glob('functions/*.function.php') as $php ) include_once( $php );
+foreach ( glob($functions . '*.function.php') as $php ) include_once( $php );
 echo ( $only ? inc( $id ) : inc('core') );
 
 function inc( $id = null )
@@ -65,9 +65,9 @@ function login()
       return _form('<input type="password" name="login"/>','Login');
 }
 
-function _form( $innerhtml, $submit = "Submit", $action = null )
+function _form( $innerhtml, $submit = "Submit", $action = null, $extra = '' )
 {
-   return '<form action="' . ($action?$action:'/'.$GLOBALS['webpath'].'?') . '" method="post">'
+   return '<form action="' . ($action?$action:'/'.$GLOBALS['webpath'].'?') . '" method="post" '. $extra .'>'
           . $innerhtml . '<input type="submit" name="submit" value="'.$submit.'" /></form>';   
 }
 
@@ -89,28 +89,22 @@ function _file_in($f)
 
 function _file_out( $f, $p )
 { 
-   $d = explode('/',$f);  
-   for( $c=0; $c<(count($d)-1); $c++ )
+   if ( !($path = _validate_path($f)) ) return;
+
+   $full = $GLOBALS['store'] . $path;
+   $path = pathinfo( $full );
+   @mkdir( $path['dirname'], 0777, true );
+
+   if(empty($p))
+         unlink($full);
+   else 
    {
-      $path = $GLOBALS['store'] . _validate_path( implode('/', array_slice($d,0,($c+1))) );
-      if( $path && !file_exists($path) )
-         mkdir($path,0777);   
+      $fp = fopen($full,'w');
+      fwrite($fp,$p);
+      fclose($fp);
    }
-
-   if ( $file = _validate_path($f) )
-   {
-      $file = $GLOBALS['store'] . $file;
-
-      if(empty($p))
-         unlink($file);
-      else 
-      {
-         $fp = fopen($file,'w');
-         fwrite($fp,$p);
-         fclose($fp);
-      }
-   } 
 }
+
 
 function _validate_path($f)
 {

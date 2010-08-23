@@ -3,10 +3,10 @@
 session_start();
 
 define('DS', DIRECTORY_SEPARATOR );
-define('FILE_FILTER', '/^[a-z0-9_\/\-\*]*(\.(?:html|css|js))?$/i' );
+define('FILE_FILTER', '/^[a-z0-9_\/\-\*\\\]*(\.(?:html|css|js))?$/i' );
 
 $index = ( isset($index) ? $index : 'index.html' );
-$store = ( isset($store) ? $store : 'data/' );
+$store = ( isset($store) ? $store : 'data' . DS );
 $base = ( isset($base) ? $base : '' );
 $id = ( empty( $_GET['id'] ) || !preg_match( FILE_FILTER, $_GET['id']) ) ? $index : str_replace('..','',$_GET['id']);
 $only = isset($_GET['only']);
@@ -14,24 +14,26 @@ $edit = isset($_GET['edit']);
 $pagepost = $_POST['page'];
 $webpath =  $base . $id;
 $installation = "<html>\n<head>\n<title>Minno</title>\n</head>\n<body>\n<minno:inc/>\n<minno:login/>\n<a href=\"?edit\">[edit]</a></body>\n</html>";
- 
+
 if ( $_POST['login'] == "{$user};{$pass}" ) _auth( true );
 if ( $_POST['submit'] == "Logout" ) _auth( false );
 
 if ( isset($_POST['page']) && _auth() ) _file_out( $id, stripslashes($pagepost) );
 
 foreach ( glob($functions . '*.function.php') as $php ) include_once( $php );
+
+if ( preg_match('/\.css$/',$id) ) header("Content-Type: text/css\n\n");
 echo ( $only ? inc( $id ) : inc('core') );
 
 function inc( $id = null )
 {
    static $_8 = array();
-
+   
    $default = empty($id);
    $id = ( $default ? $GLOBALS['id'] : $id );
    if ( !($native = _validate_path($id)) ) return '';
    $files = glob( $GLOBALS['store'] . $native );
-    
+   
    //if index file doesn't exist, autologin
    if ( empty($files) && $id == $GLOBALS['index'] ) _auth( true ); 
 	 
@@ -54,7 +56,7 @@ function inc( $id = null )
       foreach ( $files as $f )
       {
          if ( !isset($_8[$f]) )
-	 {
+	 {		
 	    $_8[$f] = 1;
 	    echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(?:params\=\"([^\"]*)\")?.*?\/?\>/i',"_mtag", _file_in( $f ) );	
 	    unset( $_8[$f] );
@@ -89,7 +91,7 @@ function _mtag($matches)
 }
 
 function _file_in($f) 
-{ 
+{ 	
    if ( $file = _validate_path( $f ) )
       return @file_get_contents( $file);
    return '';
@@ -115,9 +117,9 @@ function _file_out( $f, $p )
 
 
 function _validate_path($f)
-{
-   if ( preg_match( FILE_FILTER , $f ) )
-   	return preg_replace('/[\\/]/',DS,$f);
+{    
+   if ( preg_match( FILE_FILTER , $f ) ){
+   	return preg_replace('/[\\/\\\]/',DS,$f);}
    return null;
 }
 

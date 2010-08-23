@@ -24,7 +24,7 @@ function upload( $subdir = '' )
 
 
 
-   if ( $_POST['submit'] == 'Upload' )
+   if ( $_POST['submit'] == 'Upload' && $_POST['subdir'] == $subdir )
    {
       $subdir = _validate_path( $subdir ) . '';
       $upload_dir = (($GLOBALS['uploads']) ? $GLOBALS['uploads'] : 'uploads' . DS ) . $subdir;
@@ -42,6 +42,6 @@ function upload( $subdir = '' )
          $html .= 'Error uploading file: ' . $error_types[$_FILES['upload']['error']]; 
    }
    
-   $html .= _form('<input type="file" name="upload"/>','Upload',null,'enctype="multipart/form-data"');
+   $html .= _form('<input type="hidden" name="subdir" value="'.$subdir.'" /><input type="file" name="upload"/>','Upload',null,'enctype="multipart/form-data"');
    return $html;
 }

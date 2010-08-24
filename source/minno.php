@@ -22,7 +22,7 @@ if ( isset($_POST['page']) && _auth() ) _file_out( $id, stripslashes($pagepost) 
 
 foreach ( glob($functions . '*.function.php') as $php ) include_once( $php );
 
-if ( preg_match('/\.css$/',$id) ) header("Content-Type: text/css\n\n");
+if ( !$edit && preg_match('/\.css$/',$id) ) header("Content-Type: text/css\n\n");
 echo ( $only ? inc( $id ) : inc('core') );
 
 function inc( $id = null )

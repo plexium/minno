@@ -13,6 +13,7 @@ function editarea()
 
    if ( $GLOBALS['edit'] || !file_exists( $GLOBALS['store'] . $path ) )
    {
+      ob_start();
 ?>
 <script language="javascript" type="text/javascript" src="/<?php echo $GLOBALS['base']; ?>edit_area/edit_area_full.js"></script>
 <script language="javascript" type="text/javascript">
@@ -21,7 +22,7 @@ editAreaLoader.init({
 	,syntax: "css"			// syntax to be uses for highgliting
 	,start_highlight: true		// to display with highlight mode on start-up
 });
-</script>
-<?php
+</script><?php
+		return ob_get_clean();
     }
 }

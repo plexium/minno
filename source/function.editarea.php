@@ -6,7 +6,7 @@
  * Usage: <minno:editarea /> in the <head> area
  */
 
-function editarea()
+function editarea( $width = 400, $height = 100 )
 {
    $path = _validate_path( $GLOBALS['id'] );
    if (!$path) return;
@@ -21,6 +21,8 @@ editAreaLoader.init({
 	id : "page"		        // textarea id
 	,syntax: "css"			// syntax to be uses for highgliting
 	,start_highlight: true		// to display with highlight mode on start-up
+	,min_width: <?php echo $width; ?>
+	,min_height: <?php echo $height; ?> 
 });
 </script><?php
 		return ob_get_clean();

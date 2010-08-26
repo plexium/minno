@@ -1,6 +1,6 @@
 RewriteEngine on
 DirectoryIndex index.php
-RewriteBase /
+RewriteBase /com.bluelinecity.minno/source/
 RewriteCond %{SCRIPT_FILENAME} !-d
 RewriteCond %{SCRIPT_FILENAME} !-f
 RewriteCond %{QUERY_STRING}    !^\?id\=

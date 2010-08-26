@@ -3,12 +3,12 @@
 session_start();
 
 define('DS', DIRECTORY_SEPARATOR );
-define('FILE_FILTER', '/^[a-z0-9_\/\-\*\\\]*(\.(?:html|css|js))?$/i' );
+define('FILE_FILTER', '/^[a-z0-9_\/\-\*\\\]+(\.(?:html|css|js))?$/i' );
 
 $index = ( isset($index) ? $index : 'index.html' );
 $store = ( isset($store) ? $store : 'data' . DS );
 $base = ( isset($base) ? $base : '' );
-$id = ( empty( $_GET['id'] ) || !preg_match( FILE_FILTER, $_GET['id']) ) ? $index : str_replace('..','',$_GET['id']);
+$id = ( !preg_match( FILE_FILTER, $_GET['id'] ) ) ? $index : str_replace('..','',$_GET['id']);
 $only = isset($_GET['only']);
 $edit = isset($_GET['edit']);
 $pagepost = $_POST['page'];
@@ -119,7 +119,7 @@ function _file_out( $f, $p )
 function _validate_path($f)
 {    
    if ( preg_match( FILE_FILTER , $f ) ){
-   	return preg_replace('/[\\/\\\]/',DS,$f);}
+      return preg_replace('/[\\/\\\]/',DS,$f);}
    return null;
 }
 

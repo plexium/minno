@@ -20,7 +20,7 @@ if ( $_POST['submit'] == "Logout" ) _auth( false );
 
 if ( isset($_POST['page']) && _auth() ) _file_out( $id, stripslashes($pagepost) );
 
-foreach ( glob($functions . '*.function.php') as $php ) include_once( $php );
+foreach ( glob($functions . 'function.*.php') as $php ) include_once( $php );
 
 if ( !$edit && preg_match('/\.css$/',$id) ) header("Content-Type: text/css\n\n");
 echo ( $only ? inc( $id ) : inc('core') );

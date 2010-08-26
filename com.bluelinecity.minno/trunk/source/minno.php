@@ -85,7 +85,7 @@ function _mtag($matches)
 {	
    list( $match, $func, $params ) = $matches;
    if ( function_exists( $func ) )
-      return call_user_func_array( $func, explode(',', $params) );
+      return call_user_func_array( $func, ( empty($params) ? null : explode(',', $params) ) );
 
    return '';
 }

@@ -41,7 +41,7 @@ function breadcrumb( )
       list( $link, $text ) = explode('|',$arg);
       $buffer .= ( empty($buffer)? '' : $sep );
       $text   = (empty($text) ? ucwords( preg_replace('/[\-\_]/',' ',basename($link,'.html')) ) : $text );
-      $buffer .= ' <a href="'.htmlspecialchars($link).'">'. htmlspecialchars($text) .'</a> ';
+      $buffer .= ' <a href="/'.htmlspecialchars($link).'">'. htmlspecialchars($text) .'</a> ';
    }
     
    return $buffer;

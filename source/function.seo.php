@@ -10,6 +10,7 @@ function seo_title( $tag = 'h2' )
 	preg_match('/\<'.$tag.'[^>]*\>(.+)\<\/'.$tag.'\>/',$f, $matches );
 	return $matches[1];
 }
+
  
 function meta_description( $def = '' )
 {
@@ -18,11 +19,13 @@ function meta_description( $def = '' )
 	return '<meta name="description" content="' . ( $found ? trim(preg_replace('/\r|\n/',' ',htmlspecialchars(substr(strip_tags($matches[1]),0,255)))) : $def ) . '" />';
 }
 
-function meta_keywords( $def = '' )
+
+function meta_keywords()
 {
+	$def = func_get_args();
 	$f = _file_in($GLOBALS['store'] . _validate_path($GLOBALS['id']));
 	$found = preg_match('/\<p[^>]* class="[^"]*seo\-keywords[^"]*"[^>]*\>((\w|\W)+?)\<\/p\>/i',$f, $matches );
-	return '<meta name="keywords" content="' . $def . ( $found && !empty($def) ? ',' : '' ) . trim(preg_replace('/\r|\n/',' ',htmlspecialchars(substr(strip_tags($matches[1]),0,255)))) . '" />';
+	return '<meta name="keywords" content="' . implode(',',$def) . ( $found && !empty($def) ? ',' : '' ) . trim(preg_replace('/\r|\n/',' ',htmlspecialchars(substr(strip_tags($matches[1]),0,255)))) . '" />';
 }
 
 
@@ -60,6 +63,7 @@ function sitemap()
 		. '<li><a target="sitemap" href="http://www.bing.com/webmaster/ping.aspx?siteMap='.$submit.'">Submit to Bing</a></li>'
 		. '</ul>';
 }
+
 
 function _rglob($pattern='*', $flags = 0, $path='')
 {

@@ -92,9 +92,11 @@ function _mtag($matches)
 
 function _file_in($f) 
 { 	
+	static $c = array();
+	if ( isset($c[$f]) ) return $c[$f];
    if ( $file = _validate_path( $f ) )
-      return @file_get_contents( $file);
-   return '';
+      $c[$f] = @file_get_contents( $file );
+   return isset( $c[$f] ) ? $c[$f] : '';
 }
 
 function _file_out( $f, $p )

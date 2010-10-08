@@ -3,7 +3,7 @@
 session_start();
 
 define('DS', DIRECTORY_SEPARATOR );
-define('FILE_FILTER', '/^[a-z0-9_\/\-\*\\\]+(\.(?:html|css|js))?$/i' );
+define('FILE_FILTER', '/^[a-z0-9_\/\-\*\\\\.]+(\.(?:html|css|js))?$/i' );
 
 $index = ( isset($index) ? $index : 'index.html' );
 $store = ( isset($store) ? $store : 'data' . DS );

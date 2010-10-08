@@ -1,5 +1,5 @@
 <?php
 $user = 'topww';
-$pass = 'frogwater3';
+$pass = '';
 $base = 'com.bluelinecity.minno/source/';
 require_once("minno.php");

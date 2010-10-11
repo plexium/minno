@@ -12,8 +12,10 @@ function seo_title( $tag = 'h2' )
 }
 
  
-function meta_description( $def = '' )
-{
+function meta_description( )
+{	
+	$args = func_get_args();
+	$def = implode(',', $args);
 	$f = _file_in($GLOBALS['store'] . _validate_path($GLOBALS['id']));
 	$found = preg_match('/\<p[^>]* class="[^"]*seo\-description[^"]*"[^>]*\>((\w|\W)+?)\<\/p\>/i',$f, $matches );
 	return '<meta name="description" content="' . ( $found ? trim(preg_replace('/\r|\n/',' ',htmlspecialchars(substr(strip_tags($matches[1]),0,255)))) : $def ) . '" />';

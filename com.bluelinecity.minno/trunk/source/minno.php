@@ -1,4 +1,4 @@
-<?php //minno v1.1
+<?php //minno v1.2 beta
 
 session_start();
 

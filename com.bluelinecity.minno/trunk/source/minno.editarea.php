@@ -6,9 +6,9 @@
  * Usage: <minno:editarea /> in the <head> area
  */
 
-function editarea( $width = 400, $height = 100 )
+function minno_editarea( $width = 400, $height = 100 )
 {
-   $path = _validate_path( $GLOBALS['id'] );
+   $path = validate_path( $GLOBALS['id'] );
    if (!$path) return;
 
    if ( $GLOBALS['edit'] || !file_exists( $GLOBALS['store'] . $path ) )

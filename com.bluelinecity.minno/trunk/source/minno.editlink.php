@@ -6,9 +6,9 @@
  * Usage: <minno:editlink params="link text" />
  */
 
-function editlink( $text = '' )
+function minno_editlink( $text = '' )
 {
-   if ( !_auth() ) 
+   if ( !auth() ) 
       return '';   
    else
       return '<a href="?edit">'. (empty($text)?'[Edit this page]':$text) .'</a>';

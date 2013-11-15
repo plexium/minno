@@ -6,7 +6,7 @@
  * Usage: <minno:breadcrumb params="seperator,path|text,path,..." />
  */
 
-function breadcrumb( )
+function minno_breadcrumb( )
 {
    $args = func_get_args();
    $buffer = '';

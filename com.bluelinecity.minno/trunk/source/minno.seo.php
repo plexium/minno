@@ -6,7 +6,7 @@
 
 function seo_title( $tag = 'h2' )
 {	
-	$f = _file_in($GLOBALS['store'] . _validate_path($GLOBALS['id']));
+	$f = file_in($GLOBALS['store'] . validate_path($GLOBALS['id']));
 	preg_match('/\<'.$tag.'[^>]*\>(.+)\<\/'.$tag.'\>/',$f, $matches );
 	return $matches[1];
 }
@@ -16,7 +16,7 @@ function meta_description( )
 {	
 	$args = func_get_args();
 	$def = implode(',', $args);
-	$f = _file_in($GLOBALS['store'] . _validate_path($GLOBALS['id']));
+	$f = file_in($GLOBALS['store'] . validate_path($GLOBALS['id']));
 	$found = preg_match('/\<p[^>]* class="[^"]*seo\-description[^"]*"[^>]*\>((\w|\W)+?)\<\/p\>/i',$f, $matches );
 	return '<meta name="description" content="' . ( $found ? trim(preg_replace('/\r|\n/',' ',htmlspecialchars(substr(strip_tags($matches[1]),0,255)))) : $def ) . '" />';
 }
@@ -25,7 +25,7 @@ function meta_description( )
 function meta_keywords()
 {
 	$def = func_get_args();
-	$f = _file_in($GLOBALS['store'] . _validate_path($GLOBALS['id']));
+	$f = file_in($GLOBALS['store'] . validate_path($GLOBALS['id']));
 	$found = preg_match('/\<p[^>]* class="[^"]*seo\-keywords[^"]*"[^>]*\>((\w|\W)+?)\<\/p\>/i',$f, $matches );
 	return '<meta name="keywords" content="' . implode(',',$def) . ( $found && !empty($def) ? ',' : '' ) . trim(preg_replace('/\r|\n/',' ',htmlspecialchars(substr(strip_tags($matches[1]),0,255)))) . '" />';
 }

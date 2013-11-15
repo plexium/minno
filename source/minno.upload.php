@@ -7,9 +7,9 @@
  * Usage: <minno:upload params="uploaddir" />
  */
 
-function upload( $subdir = '' )
+function minno_upload( $subdir = '' )
 {
-   if ( !_auth() ) return 'Login to upload';
+   if ( !auth() ) return 'Login to upload';
    
    $html = '';
    $error_types = array(
@@ -26,7 +26,7 @@ function upload( $subdir = '' )
 
    if ( $_POST['submit'] == 'Upload' && $_POST['subdir'] == $subdir )
    {
-      $subdir = _validate_path( $subdir ) . '';
+      $subdir = validate_path( $subdir ) . '';
       $upload_dir = (($GLOBALS['uploads']) ? $GLOBALS['uploads'] : 'uploads' . DS ) . $subdir;
 
       @mkdir( $upload_dir, 0777, true );
@@ -42,6 +42,6 @@ function upload( $subdir = '' )
          $html .= 'Error uploading file: ' . $error_types[$_FILES['upload']['error']]; 
    }
    
-   $html .= _form('<input type="hidden" name="subdir" value="'.$subdir.'" /><input type="file" name="upload"/>','Upload',null,'enctype="multipart/form-data"');
+   $html .= form('<input type="hidden" name="subdir" value="'.$subdir.'" /><input type="file" name="upload"/>','Upload',null,'enctype="multipart/form-data"');
    return $html;
 }

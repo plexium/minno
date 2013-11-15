@@ -6,7 +6,7 @@
  * Usage: <minno:protect params="username,password" />
  */
 
-function protect()
+function minno_protect()
 {
 	$args = func_get_args();
 	

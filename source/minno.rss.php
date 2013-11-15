@@ -6,7 +6,7 @@
  * Usage: <minno:rss params="http://urltorssfeed.com/rss,10" />
  */
 
-function rss( $url = '', $limit = 10 )
+function minno_rss( $url = '', $limit = 10 )
 {
 	$items = _rss_fetch_feeds( $url, $limit );
 

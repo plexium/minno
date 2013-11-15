@@ -6,13 +6,25 @@
  * Usage: <minno:blog params="blogname" />
  */
 
-function minno_blog( $blog = 'blog' )
+function minno_blog( $blog = 'blog', $limit = 10 )
 {
+   $html = '';
+   
    if ( auth() ) 
    {
+      if ( $_POST['blog'] )
+      {
+         $
+         //create blog post//
+         file_out( $blog . DS .  '.html' );
+      }
+      
+      $html .= form('<input type="text" name="title" id="title" /><br /><textarea id="blog" name="blog"></textarea>');
    }
-
-   return minno_inc($blog . '/*.html');
+   
+   $html .= minno_inc($blog . '/*.html');
+   
+   return $html;
   
 /*
    if ( $_POST['submit'] == 'Upload' && $_POST['subdir'] == $subdir )

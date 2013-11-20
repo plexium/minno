@@ -58,8 +58,10 @@ echo minno_inc($out);
 exit(0);
 
 //core function of minno//
-function minno_inc( $id = null )
+function minno_inc( $params )
 {
+   $id = null;//
+   
    //prevent infinite recursion//
    static $_8 = array();
    
@@ -91,9 +93,9 @@ function minno_inc( $id = null )
       {
          if ( !isset($_8[$f]) )
          {		
-         $_8[$f] = 1;
-         echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(?:params\=\"([^\"]*)\")?.*?\/?\>/i',"mtag", file_in( $f ) );	
-         unset( $_8[$f] );
+            $_8[$f] = 1;
+            echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(.*?)\/?\>/i',"mtag", file_in( $f ) );	
+            unset( $_8[$f] );
          }
       }	
 	
@@ -117,14 +119,21 @@ function form( $innerhtml, $submit = "Submit", $action = null, $extra = '' )
 }
 
 //processes any minno namespace tags//
-function mtag($matches)
-{	
-   list( $match, $func, $params ) = $matches;
-   $func = 'minno_' . $func;
-   if ( function_exists( $func ) )
-      return call_user_func_array( $func, ( empty($params) ? array() : explode(',', $params) ) );
+function mtag($info)
+{
+   preg_match_all( '/(\w+)\=(\"|\')(.*?)\2/i', $info[2], $matches, PREG_SET_ORDER );
 
-   return '';
+   $attrs = array();
+   foreach ( $matches as $match )
+   {
+      $attrs[$match[1]] = $match[3];
+   }
+   
+   $func = 'minno_' . $info[1];
+   if ( function_exists( $func ) ) 
+      return call_user_func_array( $func, $attrs );
+   else
+      return '';
 }
 
 //reads a file $f from the data store//

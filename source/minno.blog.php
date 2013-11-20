@@ -6,20 +6,20 @@
  * Usage: <minno:blog params="blogname" />
  */
 
-function minno_blog( $blog = 'blog', $limit = 10 )
-{
+function minno_blog( $params )
+{   
    $html = '';
    
    if ( auth() ) 
    {
       if ( $_POST['blog'] )
       {
-         $
+         
          //create blog post//
          file_out( $blog . DS .  '.html' );
       }
       
-      $html .= form('<input type="text" name="title" id="title" /><br /><textarea id="blog" name="blog"></textarea>');
+      $html .= form('<input type="text" name="title" id="title" /><br /><textarea id="blog" name="blog"></textarea><br />');
    }
    
    $html .= minno_inc($blog . '/*.html');

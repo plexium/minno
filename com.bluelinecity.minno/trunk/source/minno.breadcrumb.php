@@ -3,21 +3,20 @@
 /*
  * Function: breadcrumb
  * Prints out a linked breadcrumb trail
- * Usage: <minno:breadcrumb params="seperator,path|text,path,..." />
+ * Usage: <minno:breadcrumb separator="&gt;" crumbs="index.html|Home,blah|blah.html" />
  */
 
-function minno_breadcrumb( )
+function minno_breadcrumb( $params )
 {
-   $args = func_get_args();
    $buffer = '';
    
-   $sep = ( count($args) >= 1 ) ? array_shift($args) : '&gt;';
-
+   $sep = empty($params['separator']) ? '&gt;' : $params['separator'];
+   $args = empty($params['crumbs']) ? array() : explode(',',$params['crumbs']);
+   
    //try and guess the path from url
    if ( count($args) == 0 )
    {      
       $id = $GLOBALS['id'];
-      //$id = 'products/vaccums/dirtdevel.html';
       $parts = explode('/', $id );
       
       $args[] = 'index.html|Home';

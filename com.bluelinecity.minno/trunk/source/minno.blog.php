@@ -9,20 +9,25 @@
 function minno_blog( $params )
 {   
    $html = '';
+   $blog = empty($params['blog']) ? 'blog' : $params['blog'];
    
    if ( auth() ) 
    {
       if ( $_POST['blog'] )
       {
-         
+      
+         $fn = preg_replace('/\s+/','-',preg_replace('/[^a-z0-9 ]/i','',$_POST['title'])) . '-' . date('Y-m-d') . '.html';
          //create blog post//
-         file_out( $blog . DS .  '.html' );
+         $content = '<article><header><h1>' . $_POST['title'];
+         $content .= '</h1><p>Published: <time pubdate="pubdate">'. date('Y-m-d') .'</time></p></header>';
+         $content .= $_POST['blog'] . '</article>';
+         file_out( $blog . DS .  $fn, $content );
       }
       
-      $html .= form('<input type="text" name="title" id="title" /><br /><textarea id="blog" name="blog"></textarea><br />');
+      $html .= form('<input type="text" name="title" placeholder="Title" id="title" /><br /><textarea id="blog" name="blog"></textarea><br />');
    }
    
-   $html .= minno_inc($blog . '/*.html');
+   $html .= minno_inc(array('id' => $blog . '/*.html'));
    
    return $html;
   

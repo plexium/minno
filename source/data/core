@@ -1,9 +1,14 @@
 <html>
 <head>
 <title>Minno</title>
+<link rel="stylesheet" type="text/css" href="http://localhost/workspace/com.bluelinecity.minno/source/style.css" />
 </head>
 <body>
-<minno:inc/>
+<h4><minno:breadcrumb separator="|" /></h4>
+<div class="container">
+   <minno:inc/>
+</div>
 <minno:login/>
-<a href="?edit">[edit]</a></body>
+
+<minno:editlink text="Edit this page" />
 </html>

@@ -51,20 +51,21 @@ if ( !$edit && preg_match('/\.(css|js)$/',$id,$matches) )
 { 
    $out = $id;   
    $mime_types = array('css'=>'css','js'=>'javascript');
-   header("Content-Type: text/". $mime_types[$mathces[1]] ."\n\n"); 
+   //header("Content-Type: text/". $mime_types[$mathces[1]] ."\n\n"); 
 }     
 
-echo minno_inc($out);
+echo minno_inc(array('id' => $out));
 exit(0);
 
 //core function of minno//
-function minno_inc( $params )
+function minno_inc( $params = array() )
 {
-   $id = null;//
+   $id = $params['id'];
    
    //prevent infinite recursion//
    static $_8 = array();
    
+   //flag for default view//
    $default = empty($id);
    $id = ( $default ? $GLOBALS['id'] : $id );
    if ( !($native = validate_path($id)) ) return '';
@@ -75,19 +76,23 @@ function minno_inc( $params )
 	 
    ob_start();
    
+   //if authed and is the inc in the core and id == requested id and asking to update or create//
    if ( auth() && $default && $id == $GLOBALS['id'] && ( $GLOBALS['edit'] || empty($files) ) )
    {
       $page = file_in( $files[0] );
       echo form('<textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars( $page ).'</textarea>', (empty($page)?'Create':'Update') );
    }
+   //else if core doesn't exist, install minno//
    else if ( count($files) == 0 && $id == 'core')
    { 
       file_out('core', $GLOBALS['installation'] ); 
       auth(true);
       echo '<html><body>Minno Installed!<br /> Start your site by <a href="?id=core&edit">editing the core file</a>.</body></html>';
    }
+   //else if no file 404//
    else if ( count($files) == 0 )
-      echo ( $id == '404' ? 'File Not Found!' : minno_inc('404') );
+      echo ( $id == '404' ? 'File Not Found!' : minno_inc(array('id'=>'404')) );
+   //else load and echo the file(s)//
    else
       foreach ( $files as $f )
       {
@@ -108,7 +113,7 @@ function minno_login()
    if ( auth() )
       return form('Click to ','Logout');
    else
-      return form('<input type="password" name="login"/>','Login');
+      return form('<input type="password" id="login" name="login"/>','Login');
 }
 
 //return an html form with $innerhtml, submit button name, action method, and any extra attrs//
@@ -131,7 +136,7 @@ function mtag($info)
    
    $func = 'minno_' . $info[1];
    if ( function_exists( $func ) ) 
-      return call_user_func_array( $func, $attrs );
+      return call_user_func( $func, $attrs );
    else
       return '';
 }

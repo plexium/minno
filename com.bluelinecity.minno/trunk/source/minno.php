@@ -6,7 +6,7 @@ session_start();
 define('DS', DIRECTORY_SEPARATOR );
 
 //if file doesn't match this then default to $index//
-define('FILE_FILTER', '/^[a-z0-9_\/\-\*\\\\.]+(\.(?:html|css|js))?$/i' );
+define('FILE_FILTER', '/^[a-z0-9][a-z0-9_\/\-\*\\\\.]+(\.(?:html|css|js))?$/i' );
 
 //default file to serve, Defaults to index.html//
 $index = ( isset($index) ? $index : 'index.html' );
@@ -57,10 +57,10 @@ if ( !$edit && preg_match('/\.(css|js)$/',$id,$matches) )
 echo minno_inc(array('id' => $out));
 exit(0);
 
-//core function of minno//
+//core function of minno, params: id, rsort, limit//
 function minno_inc( $params = array() )
 {
-   $id = $params['id'];
+   extract($params);
    
    //prevent infinite recursion//
    static $_8 = array();
@@ -70,6 +70,14 @@ function minno_inc( $params = array() )
    $id = ( $default ? $GLOBALS['id'] : $id );
    if ( !($native = validate_path($id)) ) return '';
    $files = glob( $GLOBALS['store'] . $native );
+   
+   if ( !empty($rsort) ) rsort($files);
+   
+   if ( !empty($limit) )
+   {
+      $offset = ( empty($_GET['page']) ? 0 : (intval($_GET['page'])-1) * intval($limit) );
+      $files = array_slice( $files, $offset, $limit );
+   }
    
    //if index file doesn't exist, autologin
    if ( empty($files) && $id == $GLOBALS['index'] ) auth( true ); 
@@ -87,13 +95,16 @@ function minno_inc( $params = array() )
    { 
       file_out('core', $GLOBALS['installation'] ); 
       auth(true);
-      echo '<html><body>Minno Installed!<br /> Start your site by <a href="?id=core&edit">editing the core file</a>.</body></html>';
+      echo 'Start your site by <a href="?id=core&edit">editing the core file</a>.';
    }
    //else if no file 404//
    else if ( count($files) == 0 )
+   {
       echo ( $id == '404' ? 'File Not Found!' : minno_inc(array('id'=>'404')) );
+   }
    //else load and echo the file(s)//
    else
+   {
       foreach ( $files as $f )
       {
          if ( !isset($_8[$f]) )
@@ -103,7 +114,8 @@ function minno_inc( $params = array() )
             unset( $_8[$f] );
          }
       }	
-	
+	}
+   
    return ob_get_clean();
 }
 

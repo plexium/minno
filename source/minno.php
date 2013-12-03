@@ -75,7 +75,9 @@ function minno_inc( $params = array() )
    
    if ( !empty($limit) )
    {
-      $offset = ( empty($_GET['page']) ? 0 : (intval($_GET['page'])-1) * intval($limit) );
+      $count = count($files);
+      $page = empty($_GET['page']) ? 1 : intval($_GET['page']);
+      $offset = ($page-1) * intval($limit);
       $files = array_slice( $files, $offset, $limit );
    }
    
@@ -108,12 +110,22 @@ function minno_inc( $params = array() )
       foreach ( $files as $f )
       {
          if ( !isset($_8[$f]) )
-         {		
+          {		
             $_8[$f] = 1;
             echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(.*?)\/?\>/i',"mtag", file_in( $f ) );	
             unset( $_8[$f] );
          }
-      }	
+      }
+      
+      //if pageinated//
+      if ( $count > $limit )
+      {
+         if ( $page != 1 ) 
+            echo '<a href="?page='. ($page-1) .'">&lt;&lt; Previous</a>';
+            
+         if ( ceil($count / $limit) != $page ) 
+            echo '<a href="?page='. ($page+1) .'">Next &gt;&gt;</a>';
+      }
 	}
    
    return ob_get_clean();

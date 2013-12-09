@@ -120,11 +120,19 @@ function minno_inc( $params = array() )
       //if pageinated//
       if ( $count > $limit )
       {
+         echo '<div class="paginate">';
          if ( $page != 1 ) 
-            echo '<a href="?page='. ($page-1) .'">&lt;&lt; Previous</a>';
-            
+            echo '<a href="?page='. ($page-1) .'" class="previous">&lt;&lt; Previous</a> ';
+         
+         for ( $i = 1; $i < ceil($count/$limit)+1; $i++ )
+            if ( $i == $page )
+               echo '&nbsp;&nbsp;<span>'.$i.'</span>&nbsp;&nbsp;';
+            else
+               echo '&nbsp;&nbsp;<a href="?page='.$i.'">'.$i.'</a>&nbsp;&nbsp;';
+         
          if ( ceil($count / $limit) != $page ) 
-            echo '<a href="?page='. ($page+1) .'">Next &gt;&gt;</a>';
+            echo ' <a href="?page='. ($page+1) .'" class="next">Next &gt;&gt;</a>';            
+         echo '</div>';
       }
 	}
    
@@ -185,7 +193,7 @@ function file_out( $f, $p )
    @mkdir( $path['dirname'], 0777, true );
 
    if(empty($p))
-         unlink($full);
+      unlink($full);
    else 
    {
       $fp = fopen($full,'w');

@@ -16,7 +16,7 @@ function minno_blog( $params )
    {
       if ( $_POST['blog'] )
       {  
-         $fn = date('Y-m-d-His-') . preg_replace('/\s+/','-',preg_replace('/[^a-z0-9 ]/i','',$_POST['title'])) . '.html';
+         $fn = date('Y/m/d/His-') . preg_replace('/\s+/','-',preg_replace('/[^a-z0-9 ]/i','',$_POST['title'])) . '.html';
          //create blog post//
          $content = "<article>\n<header><h1>\n<a href=\"". $blog . '/' .  $fn .'">' . $_POST['title'];
          $content .= "</a></h1>\n<p>Published: <time pubdate=\"pubdate\">". date('Y-m-d') ."</time></p></header>\n";
@@ -27,7 +27,7 @@ function minno_blog( $params )
       $html .= form('<input type="text" name="title" placeholder="Title" id="title" /><br /><textarea id="blog" name="blog"></textarea><br />');
    }
    
-   $html .= minno_inc(array('id' => $blog . '/*.html','rsort' => 1,'limit' => $limit));
+   $html .= minno_inc(array('id' => $blog . '/*/*/*/*.html','rsort' => 1,'limit' => $limit));
    
    return $html;
   

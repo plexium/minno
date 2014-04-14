@@ -1,12 +1,12 @@
 <?php
 
 /*
- * Function: blog
- * Manages a blog on a site.
+ * Function: comments
+ * Manages user submitted comments to a particular piece of content.
  * Usage: <minno:blog params="blogname" />
  */
 
-function minno_blog( $params )
+function minno_comments( $params )
 {   
    $html = '';
    $blog = empty($params['blog']) ? 'blog' : $params['blog'];

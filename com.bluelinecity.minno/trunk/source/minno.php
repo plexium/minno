@@ -30,7 +30,7 @@ $pagepost = $_POST['page'];
 $webpath =  $base . $id;
 
 //in case of installation seed with this xml//
-$installation = "<html>\n<head>\n<title></title>\n</head>\n<body>\n<minno:inc/>\n<minno:login/>\n<a href=\"?edit\">[edit]</a></body>\n</html>";
+$installation = "<html>\n<head>\n<title></title>\n<style type=\"text/css\">\nform textarea,\nform input{\nborder:1px solid #666;\nborder-radius:2px;\npadding:5px;\nfont-size:0.9em;\nmargin:5px;\n}\n</style>\n</head>\n<body>\n<minno:inc/>\n<minno:login/>\n<a href=\"?edit\">[edit]</a></body>\n</html>";
 
 //process a login attempt, if username password match then mark as authed//
 if ( $_POST['login'] == "{$user};{$pass}" ) auth( true );
@@ -77,8 +77,8 @@ function minno_inc( $params = array() )
    {
       $count = count($files);
       $page = empty($_GET['page']) ? 1 : intval($_GET['page']);
-      $offset = ($page-1) * intval($limit);
-      $files = array_slice( $files, $offset, $limit );
+      $offset = ($page-1) * intval($limit);  
+      $files = array_slice( $files, $offset, $limit );   
    }
    
    //if index file doesn't exist, autologin
@@ -90,7 +90,7 @@ function minno_inc( $params = array() )
    if ( auth() && $default && $id == $GLOBALS['id'] && ( $GLOBALS['edit'] || empty($files) ) )
    {
       $page = file_in( $files[0] );
-      echo form('<textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars( $page ).'</textarea>', (empty($page)?'Create':'Update') );
+      echo form('<textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars( $page ).'</textarea><br />', (empty($page)?'Create':'Update') );
    }
    //else if core doesn't exist, install minno//
    else if ( count($files) == 0 && $id == 'core')

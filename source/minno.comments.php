@@ -7,28 +7,62 @@
  */
 
 function minno_comments( $params )
-{   
-   $html = '';
-   $blog = empty($params['blog']) ? 'blog' : $params['blog'];
-   $limit = empty($params['limit']) ? 10 : $params['limit'];
-   
-   if ( auth() ) 
+{
+   global $_8;
+
+   $source = $_8[count($_8)-1];
+   $comments = glob( $source . '.comment.*.html' );
+
+   if ( auth() )
    {
-      if ( $_POST['blog'] )
+      if ( $_POST['comment'] )
       {  
-         $fn = date('Y/m/d/His-') . preg_replace('/\s+/','-',preg_replace('/[^a-z0-9 ]/i','',$_POST['title'])) . '.html';
+         $fn = dirname($source) . DS . '.' . basename($source) . '.comment.' . count($comments) . 'p.html';
+
          //create blog post//
          $content = "<article>\n<header><h1>\n<a href=\"". $blog . '/' .  $fn .'">' . $_POST['title'];
          $content .= "</a></h1>\n<p>Published: <time pubdate=\"pubdate\">". date('Y-m-d') ."</time></p></header>\n";
-         $content .= $_POST['blog'] . "\n</article>";
-         file_out( $blog . DS .  $fn, $content );
+         $content .= $_POST['comment'] . "\n</article>";
+         echo $fn;
+         file_out( $fn, $content );
       }
       
-      $html .= form('<input type="text" size="80" name="title" placeholder="Title" id="title" /><br /><textarea cols="80" rows="20" id="blog" name="blog"></textarea><br />');
+      if ( $_POST['moderate'] )
+      {
+         echo $_POST['submit'];
+         if ( $_POST['submit'] == 'Approve' )
+         {
+            rename( $_POST['moderate'], preg_replace('/p\.html$/','.html',$_POST['moderate']) );
+         }
+         else
+         {            
+            unlink($_POST['moderate']);
+         }
+         
+         $comments = glob( $source . '.comment.*.html' );
+      }
    }
    
-   $html .= minno_inc(array('id' => $blog . '/*/*/*/*.html','rsort' => 1,'limit' => $limit));
+   $html = '';
+   foreach ( $comments as $file )
+   {
+      if ( preg_match('/p\.html$/',$file) )
+      {
+         if ( auth() )
+         {
+            $html .= '<article class="pending">' . file_in($file) . 
+            form('<input type="hidden" value="'. $file .'" name="moderate" />'.
+               '<input type="submit" name="submit" value="Delete" />','Approve') .
+            '</article>';
+         }
+      }
+      else
+      {
+         $html .= '<article>' . file_in($file) . '</article>';
+      }
+   }
    
-   return $html;
-  
+   $html .= form('<textarea cols="30" rows="2" id="comment" name="comment"></textarea><br />');
+   
+   return '<section class="comments"><h3>'. count($comments) .' Comments</h3>' . $html . '</section>';  
 }

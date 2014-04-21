@@ -54,6 +54,9 @@ if ( !$edit && preg_match('/\.(css|js)$/',$id,$matches) )
    //header("Content-Type: text/". $mime_types[$mathces[1]] ."\n\n"); 
 }     
 
+//recursion detection//
+$_8 = array();   
+
 echo minno_inc(array('id' => $out));
 exit(0);
 
@@ -63,7 +66,7 @@ function minno_inc( $params = array() )
    extract($params);
    
    //prevent infinite recursion//
-   static $_8 = array();
+   global $_8;
    
    //flag for default view//
    $default = empty($id);
@@ -109,11 +112,11 @@ function minno_inc( $params = array() )
    {
       foreach ( $files as $f )
       {
-         if ( !isset($_8[$f]) )
-          {		
-            $_8[$f] = 1;
+         if ( !in_array($f,$_8) )
+          {
+            array_push( $_8, $f );
             echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(.*?)\/?\>/i',"mtag", file_in( $f ) );	
-            unset( $_8[$f] );
+            array_pop( $_8 ); 
          }
       }
       

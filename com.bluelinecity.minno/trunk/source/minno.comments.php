@@ -13,23 +13,22 @@ function minno_comments( $params )
    $source = $_8[count($_8)-1];
    $comments = glob( $source . '.comment.*.html' );
 
-   if ( auth() )
-   {
-      if ( $_POST['comment'] )
-      {  
-         $fn = dirname($source) . DS . '.' . basename($source) . '.comment.' . count($comments) . 'p.html';
+   //post comment if found//
+   if ( $_POST['comment'] )
+   {  
+      $fn = dirname($source) . DS . '.' . basename($source) . '.comment.' . count($comments) . 'p.html';
 
-         //create blog post//
-         $content = "<article>\n<header><h1>\n<a href=\"". $blog . '/' .  $fn .'">' . $_POST['title'];
-         $content .= "</a></h1>\n<p>Published: <time pubdate=\"pubdate\">". date('Y-m-d') ."</time></p></header>\n";
-         $content .= $_POST['comment'] . "\n</article>";
-         echo $fn;
-         file_out( $fn, $content );
-      }
-      
+      //create blog post//
+      $content = "<article>\n<header><h1>\n<a href=\"". $blog . '/' .  $fn .'">' . $_POST['title'];
+      $content .= "</a></h1>\n<p>Published: <time pubdate=\"pubdate\">". date('Y-m-d') ."</time></p></header>\n";
+      $content .= $_POST['comment'] . "\n</article>";
+      file_out( $fn, $content );
+   }
+
+   if ( auth() )
+   {      
       if ( $_POST['moderate'] )
       {
-         echo $_POST['submit'];
          if ( $_POST['submit'] == 'Approve' )
          {
             rename( $_POST['moderate'], preg_replace('/p\.html$/','.html',$_POST['moderate']) );
@@ -48,12 +47,12 @@ function minno_comments( $params )
    {
       if ( preg_match('/p\.html$/',$file) )
       {
+         //display pending comments if authenticated//
          if ( auth() )
          {
-            $html .= '<article class="pending">' . file_in($file) . 
-            form('<input type="hidden" value="'. $file .'" name="moderate" />'.
-               '<input type="submit" name="submit" value="Delete" />','Approve') .
-            '</article>';
+            $html .= form('<textarea cols="30" rows="2" name="comment">'.  file_in($file) .'</textarea><br />'.
+               '<input type="hidden" value="'. $file .'" name="moderate" />'.
+               '<input type="submit" name="submit" value="Delete" />','Approve');
          }
       }
       else

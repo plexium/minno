@@ -25,16 +25,17 @@ function minno_comments( $params )
       $content .= "</a></h1>\n<p>Published: <time pubdate=\"pubdate\">". date('Y-m-d') ."</time></p></header>\n";
       $content .= $_POST['comment'] . "\n</article>";
       file_out( $fn, $content );
+      $html = '<span class="pending-comment">Your comment is pending approval...<br /></span>';
    }
-
+   else
+   {
+      $html = form('<textarea cols="30" rows="2" id="comment" name="comment"></textarea><br />');
+   }
    
-   $html = '';
    foreach ( $comments as $file )
    {
       $html .= '<article>' . file_in($file) . '</article>';
    }
-   
-   $html .= form('<textarea cols="30" rows="2" id="comment" name="comment"></textarea><br />');
-   
+      
    return '<section class="comments"><h3>'. count($comments) .' Comments</h3>' . $html . '</section>';  
 }

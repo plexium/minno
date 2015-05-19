@@ -2,7 +2,7 @@
 
 session_start();
 
-//convience define//
+//convenience define//
 define('DS', DIRECTORY_SEPARATOR );
 
 //if file doesn't match this then default to $index//

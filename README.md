@@ -29,21 +29,29 @@ __Then Minno might be right for you!__
 
 2. You should have the following three files.
 
-3. .htaccess - Keeps the urls pretty by forcing all requests through Minno
+* .htaccess - Keeps the urls pretty by forcing all requests through Minno
 
-index.php - Configuration file and CMS front-end.
+* index.php - Configuration file and CMS front-end.
 
-minno.php - The minno CMS.
+* minno.php - The minno CMS.
 
-Open index.php and edit the $user and $pass variables with what you would like the login to be. 
+4. Open index.php and edit the $user and $pass variables with what you would like the login to be. 
 Other configuration variables that can be specified here include:
-$index - default web page. Defaults to 'index.html'.
-$store - path to the data folder where all the web pages are saved. Defaults to 'data/'.
-$base - base url path in case the web site is in a subfolder. Defaults to ''.
-$functions - path to extra functions folder. Defaults to ''.
-Create a data folder to hold the web site's data files. and make it world writable. Minno defaults to 'data/'.
-Now go to the site in your web browser. Minno should detect no "core" file and will create one for you. The core is essentally the HTML wrapper called for every page request on Minno. This is where your site design gets placed.
-You will be automatically logged in after the script installs. So you can begin editing your web site.
+
+* $index - default web page. Defaults to 'index.html'.
+
+* $store - path to the data folder where all the web pages are saved. Defaults to 'data/'.
+
+* $base - base url path in case the web site is in a subfolder. Defaults to ''.
+
+* $functions - path to extra functions folder. Defaults to ''.
+
+5. Create a data folder to hold the web site's data files. and make it world writable. Minno defaults to 'data/'.
+
+6. Now go to the site in your web browser. Minno should detect no "core" file and will create one for you. The 
+core is essentally the HTML wrapper called for every page request on Minno. This is where your site design gets placed.
+
+7.  You will be automatically logged in after the script installs. So you can begin editing your web site.
 
 ### Site Creation
 

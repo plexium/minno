@@ -1,6 +1,6 @@
 RewriteEngine on
 DirectoryIndex index.php
-RewriteBase /vagrant/workspace/minno/
+RewriteBase /vagrant/workspace/minno/public/
 RewriteCond %{SCRIPT_FILENAME} !-d
 RewriteCond %{SCRIPT_FILENAME} !-f
 RewriteCond %{QUERY_STRING}    !^\?id\=

@@ -1,5 +1,7 @@
 <?php //minno v1.2 beta
 
+require_once('config.php');
+
 session_start();
 
 //convenience define//
@@ -11,8 +13,10 @@ define('FILE_FILTER', '/^[a-z0-9][a-z0-9_\/\-\*\\\\.]+(\.(?:html|css|js))?$/i' )
 //default file to serve, Defaults to index.html//
 $index = ( isset($index) ? $index : 'index.html' );
 
+$appdir = dirname(__FILE__) . DS;
+
 //location of the data store on the server defaults to data/ //
-$store = ( isset($store) ? $store : 'data' . DS );
+$store = ( isset($store) ? $store : $appdir . 'data' . DS );
 
 //url base for the site in case it's in a sub directory//
 $base = ( isset($base) ? $base : '' );
@@ -47,9 +51,8 @@ if ( isset($_POST['submit']) && $_POST['submit'] == "Logout" ) auth( false );
 //if page content has been posted and the user is authenticated, save the file//
 if ( isset($_POST['page']) && auth() ) file_out( $id, stripslashes($pagepost) );
 
-
 //include all the minno extentions found in the base directory minno.*.php//
-foreach ( glob('minno.*.php') as $php ) include_once( $php );
+foreach ( glob($appdir . 'minno.*.php') as $php ) include_once( $php );
 
 //figure out what to display first//
 $out = 'core';
@@ -58,7 +61,7 @@ if ( !$edit && preg_match('/\.(css|js)$/',$id,$matches) )
 {
    $out = $id;
    $mime_types = ['css'=>'css','js'=>'javascript'];
-   //header("Content-Type: text/". $mime_types[$mathces[1]] ."\n\n");
+   header("Content-Type: text/". $mime_types[$matches[1]] ."\n\n");
 }
 
 //recursion detection//
@@ -81,6 +84,10 @@ function minno_inc( $params = [] )
    if ( !($native = validate_path($id)) ) return '';
    $files = glob( $GLOBALS['store'] . $native );
 
+   foreach ($files as $i => $file ){
+     $files[$i] = substr($file,strlen($GLOBALS['store']));
+   }
+
    if ( !empty($rsort) ) rsort($files);
 
    if ( !empty($limit) )
@@ -100,7 +107,7 @@ function minno_inc( $params = [] )
    if ( auth() && $default && $id == $GLOBALS['id'] && ( $GLOBALS['edit'] || empty($files) ) )
    {
       $page = isset($files[0]) ? file_in( $files[0] ) : '';
-      echo form('<textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars( $page ).'</textarea><br />', (empty($page)?'Create':'Update') );
+      echo form('<textarea cols="80" rows="20" id="page" name="page">'.htmlspecialchars( $page ).'</textarea>', (empty($page)?'Create':'Update') );
    }
    //else if core doesn't exist, install minno//
    else if ( count($files) == 0 && $id == 'core')
@@ -112,7 +119,7 @@ function minno_inc( $params = [] )
    //else if no file 404//
    else if ( count($files) == 0 )
    {
-      echo ( $id == '404' ? 'File Not Found!' : minno_inc(['id'=>'404']) );
+      echo ( $id == '404' ? 'File Not Found' : minno_inc(['id'=>'404']) );
    }
    //else load and echo the file(s)//
    else
@@ -122,7 +129,7 @@ function minno_inc( $params = [] )
          if ( !in_array($f,$_8) )
           {
             array_push( $_8, $f );
-            echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(.*?)\/?\>/i',"mtag", file_in( $f ) );
+            echo preg_replace_callback('/\<minno\:([a-z0-9][a-z0-9_]*)\s*(.*?)\/?\>/i','mtag', file_in( $f ) );
             array_pop( $_8 );
          }
       }
@@ -155,14 +162,14 @@ function minno_login()
    if ( auth() )
       return form('Click to ','Logout');
    else
-      return form('<input type="password" id="login" name="login"/>','Login');
+      return form('<input type="password" id="login" name="login">','Login');
 }
 
 //return an html form with $innerhtml, submit button name, action method, and any extra attrs//
 function form( $innerhtml, $submit = "Submit", $action = null, $extra = '' )
 {
    return '<form action="' . ($action?$action:'/'.$GLOBALS['webpath']) . '" method="post" '. $extra .'>'
-          . $innerhtml . '<input type="submit" name="submit" value="'.$submit.'" /></form>';
+          . $innerhtml . '<input type="submit" name="submit" value="'.$submit.'"></form>';
 }
 
 //processes any minno namespace tags//
@@ -187,18 +194,16 @@ function mtag($info)
 function file_in($f)
 {
   static $c = [];
+
 	if ( isset($c[$f]) ) return $c[$f];
-  if ( $file = validate_path( $f ) )
-    $c[$f] = @file_get_contents( $file );
+  $c[$f] = @file_get_contents($GLOBALS['store'] . $f);
   return isset( $c[$f] ) ? $c[$f] : '';
 }
 
 //writes (or deletes) file $f using the data from $p//
 function file_out( $f, $p )
 {
-   if ( !($path = validate_path($f)) ) return;
-
-   $full = $GLOBALS['store'] . $path;
+   $full = $GLOBALS['store'] . $f;
    $path = pathinfo( $full );
    @mkdir( $path['dirname'], 0777, true );
 
